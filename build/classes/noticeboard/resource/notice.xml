@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper      
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"      
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="notice">
+	<!-- <select id="list" resultType="test.Emp"> select empno, ename, hiredate 
+		from emp order by empno desc </select> -->
+	<select id="Nlist" resultType="noticeboard.NoticeBean">
+		SELECT * FROM news order by N_num
+		desc
+	</select>
+	<!-- 페이징@@@ /*select * from (select rownum rnum, niew_num, niew_id, notice_subject,notice_content, 
+		notice_file, notice_readcount, notice_date from (select * from news order 
+		by rev_num desc,rev_date asc)) where rnum>=? and rnum<=? */ -->
+	<!-- select * from (select rownum rnum,BOARD_NUM,BOARD_ID,BOARD_SUBJECT 
+		BOARD_CONTENT,BOARD_FILE,BOARD_RE_REF,BOARD_RE_LEV BOARD_RE_SEQ,BOARD_READCOUNT,BOARD_DATE 
+		from (select * from memberboard order by rev_num desc)) where rnum>=? and 
+		rnum<=? -->
+
+	<!-- select * from (select rownum rnum,BOARD_NUM,BOARD_ID,BOARD_SUBJECT 
+		BOARD_CONTENT,BOARD_FILE,BOARD_RE_REF,BOARD_RE_LEV BOARD_RE_SEQ,BOARD_READCOUNT,BOARD_DATE 
+		from (select * from memberboard order by rev_num desc)) where rnum>=? and 
+		rnum<=? -->
+	<!-- 여기가 문제 였어....resultType="noticeboard.noticeBean"jdbcType=NUMBER -->
+	<select id="Npagelist" resultType="noticeboard.NoticeBean">
+		select * from (select rownum rnum, n_id, n_pw, n_num,n_subject, n_content,
+		n_readcount, n_date from (select * from news order by n_num
+		desc))
+		where rnum &gt;= #{page} and rnum &lt;= #{limit}
+	</select>
+	<select id="Ncheck" resultType="java.util.HashMap">
+		select * from news where
+		n_id=#{n_id} and n_pw = #{n_pw, jdbcType=VARCHAR}
+	</select>
+	<select id="Ncheck2" resultType="noticeboard.NoticeBean">
+		select * from news where
+		n_num=#{n_num } and n_pw = #{n_pw, jdbcType=VARCHAR}
+	</select>
+	<select id="Ninfo" resultType="noticeboard.NoticeBean">
+		select * from news where n_num =
+		#{n_num}
+	</select>	<!-- Integer -->
+	<select id="Ncount" resultType="Integer">
+		SELECT COUNT (*) as count FROM
+		news
+	</select>
+	<delete id="Ndelete">
+		delete from news where n_num = #{n_num}
+	</delete>
+
+	<update id="Nupdate" parameterType="noticeboard.NoticeBean">
+		update news set n_subject =
+		#{n_subject}, n_content = #{n_content}
+		where n_num = #{n_num}
+	</update>
+
+	<!-- 더하기 체크 -->
+	<update id="Ncountupdate" parameterType="noticeboard.NoticeBean">
+		update news set
+		n_readcount = n_readcount+1
+		where n_num = #{n_num}
+	</update>
+
+	<select id="Ngetlist" parameterType="int" resultType="noticeboard.NoticeBean">
+		select
+		count(*) from news
+	</select>
+
+	<insert id="Nadd" parameterType="noticeboard.NoticeBean">
+		INSERT INTO news ( n_id, n_pw,
+		n_num, n_subject, n_content, n_readcount, n_date)
+		VALUES (
+		#{n_id}, #{n_pw}, n_seq.NEXTVAL, #{n_subject},#{n_content}, 1,
+		SYSDATE)
+	</insert>
+
+
+</mapper>

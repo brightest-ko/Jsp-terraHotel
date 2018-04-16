@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper      
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"      
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 이벤트 리스트로 빼옴 -->
+<mapper namespace="terra.eventboard.EventDAO">
+
+	<!-- 해당 회원정보 이벤트 응모 페이지 -->
+	 <select id="eventpagelist"  resultType="eventboard.EventBean">	 
+		select * from (select rownum rnum, ev_num, ev_id, ev_subject, ev_content, ev_file, ev_count, ev_date from (select * from event_board order by ev_num desc)) 
+		where rnum &gt;= #{page} and rnum &lt;= #{limit} 
+	</select>
+	<!-- 	
+	<select id="eventpagelist"  resultType="eventboard.EventBean">	 
+		select * from (select rownum rnum, ev_num, ev_id, ev_subject, ev_content, ev_file, ev_count, ev_date from (select * from event_board order by ev_num desc)) 
+		where rnum &gt;= #{page} and rnum &lt;= #{limit} 
+	</select>
+	 -->	
+	<!-- eventcheckpagelist -->	
+	 <select id="eventcheckpagelist"  resultType="eventboard.EventCheckBean">	 
+		select * from (select rownum rnum, ec_num, ec_id, ec_date from (select * from event_check order by ec_date desc)) 
+		where rnum &gt;= #{begin} and rnum &lt;= #{end} and ec_id=#{ec_id}
+	</select>	
+	
+	 <!-- 유효성 체크 부분@@@@  -->
+	<!-- 유효성 체에에크Syntax error, insert "Dimensions" to complete 
+	 TypeArgument resultType="java.util.HashMap"-->	 
+	<!--  
+		<select id="check"   resultType="java.util.HashMap">
+		select *  from review_board where rev_id=#{rev_id} and rev_pw = #{rev_pw, jdbcType=VARCHAR} 
+	</select>		
+		<select id="check2"   resultType="reviewboard.ReviewBean">
+		select *  from review_board where rev_num=#{rev_num } and rev_pw = #{rev_pw, jdbcType=VARCHAR} 
+	</select>	
+	 -->
+	<!-- 상세보기  -->
+	<select id="eventinfo" resultType="eventboard.EventBean">
+		select * from event_board where ev_num = #{ev_num}
+	</select>
+	<!--  Integer-->
+	 	<select id="eventcount"  resultType="Integer">
+		select  count (*) as count  from event_board
+	</select>	 
+	
+	<!-- 카운트 총 갯수 빼온다@@@페이징@@@@ -->
+	 	<select id="evcount"  resultType="Integer">
+		select  count (*) as count  from event_board
+	</select>	 
+		<select id="countEuser_id"  resultType="Integer">
+		select  count (*) as count  from event_board where ev_id=#{word}
+	</select>	
+		<select id="countEsubject"  resultType="Integer">
+		select  count (*) as count  from event_board where ev_subject=#{word}
+	</select>	
+		<select id="countEcontent"  resultType="Integer">
+		select  count (*) as count  from event_board where ev_content=#{word}
+	</select>		
+	<!-- pageElist  pageElistuser_id  pageElistsubeject  pageElistcontent  -->
+	<select id="pageElist" resultType="eventboard.EventBean">
+	 select ROWNUM, ev_num , ev_id , ev_subject , ev_content, ev_count, ev_file, ev_date 
+	 from ( select ROWNUM rnum, ev_num , ev_id , ev_subject , ev_content, ev_count, ev_file, ev_date 
+	 from ( select * from event_board order by ev_num desc)) 
+		where rnum &gt;= #{page} and rnum &lt;= #{limit}	
+	</select>
+	
+	<select id="pageElistuser_id" resultType="eventboard.EventBean">
+	 select rownum, ev_num , ev_id , ev_subject , ev_content, ev_count, ev_file, ev_date from ( select rownum rnum, ev_num , ev_id , ev_subject , ev_content, ev_count, ev_file, ev_date 
+	 from ( select * from event_board where ev_id like '%'||#{word}||'%' order by ev_num desc)) 
+		where rnum &gt;= #{page} and rnum &lt;= #{limit}		
+	</select>
+	<select id="pageElistsubeject" resultType="eventboard.EventBean">
+		select ROWNUM, ev_num , ev_id , ev_subject , ev_content, ev_count, ev_file, ev_date 
+	 from ( select ROWNUM rnum, ev_num , ev_id , ev_subject , ev_content, ev_count, ev_file, ev_date 
+	 from ( select * from event_board where ev_subject like '%'||#{word}||'%' order by ev_num desc)) 
+		where rnum &gt;= #{page} and rnum &lt;= #{limit}
+	</select>
+	
+	<select id="pageElistcontent" resultType="eventboard.EventBean">
+		elect ROWNUM, ev_num, ev_id, ev_subject, ev_content, ev_file, ev_count, ev_date
+		from ( select ROWNUM rnum, ev_num, ev_id, ev_subject, ev_content, ev_file, ev_count, ev_date
+		from ( select * from event_board where ev_content like '%'||#{word}||'%' order by ev_num desc)) 
+		where rnum &gt;= #{page} and rnum &lt;= #{limit}
+	</select>	
+	<!-- 회원 응모 카운트 총 갯수 빼온다@@@ -->
+	 	<select id="eventcheckcount"  resultType="Integer">
+		SELECT  COUNT (*) as count  FROM event_check where ec_id=#{ec_id}
+	</select><!-- 맞음@@@@ -->	 
+	
+	<!-- 삭제처리 -->
+		 
+	 <delete id="eventdelete">
+		delete from event_board where ev_num = #{ev_num} 
+	</delete>
+	<!-- eventcheckdelete 회원이 직접 응모 취소 -->
+	 <delete id="eventcheckdelete">
+		delete from event_check where ec_num = #{ec_num} and ec_id = #{ec_id} 
+	</delete>
+	<!-- eventcheckdelete2 -->
+	 <delete id="eventcheckdelete2">
+		delete from event_check where ec_num = #{ec_num}  
+	</delete>	
+
+	<!-- 수정시 업데이트 이미지 없을때 -->
+	<update id="eventupdate" parameterType="eventboard.EventBean">
+		update event_board set ev_subject = #{ev_subject}, ev_content = #{ev_content}, ev_count=#{ev_count}, ev_date=sysdate 
+		 where ev_num = #{ev_num}
+	</update>
+	 <!-- admineventupdate 이미지 있을때 -->
+	<update id="admineventupdate" parameterType="eventboard.EventBean">
+		update event_board set ev_subject = #{ev_subject}, ev_content = #{ev_content}, ev_count=#{ev_count},ev_file=#{ev_file, jdbcType=VARCHAR}, ev_date=sysdate 
+		 where ev_num = #{ev_num}
+	</update>	
+	 <!-- 카운트수 -1 -->
+	 <update id="eventcountcheck" parameterType="eventboard.EventBean">
+		update event_board set ev_count = ev_count-1 
+		 where ev_num = #{ev_num}
+	</update>
+	<!-- 카운트수 +1  eventcheckupcount -->	
+	<update id="eventcheckupcount" parameterType="eventboard.EventBean">
+		update event_board set ev_count = ev_count+1 
+		 where ev_num = #{ev_num}
+	</update>	
+	 
+	 <select id="eventcheck" resultType="String">
+		select ec_id  from event_check where ec_num=#{ec_num}
+	</select>
+	<!-- ???뭐지??? -->
+	<select id="getlist" resultType="Integer">
+		select count(*) as count from event_board
+	</select>
+	<!-- 추가 -->	
+	<insert id="evadd" parameterType="eventboard.EventBean">
+		INSERT INTO event_board (ev_num, ev_id, ev_subject, ev_content, ev_file,ev_count, ev_date)
+		VALUES ( ev_seq.NEXTVAL, #{ev_id}, #{ev_subject},#{ev_content}, #{ev_file,  jdbcType=VARCHAR}, #{ev_count}, SYSDATE)
+	</insert>	
+	 <!-- 이벤트체크테이블 추가하기 -->
+	
+	<insert id="ecupdate" parameterType="eventboard.EventCheckBean">
+		INSERT INTO event_check (ec_num, ec_id, ec_date)
+		VALUES ( #{ec_num}, #{ec_id}, SYSDATE)
+	</insert>	
+	
+</mapper>

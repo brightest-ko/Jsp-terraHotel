@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper      
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"      
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="qna">
+	<!-- 
+	<select id="list" resultType="test.Emp">
+		select empno, ename, hiredate from emp order by empno desc
+	</select>
+	 -->
+	<select id="qlist" resultType="qnaboard.QnaBean">
+		SELECT * FROM qna_board order by q_re_ref desc, q_re_lev ASC
+	</select>
+	<!-- 페이징@@@
+	/*select * from (select rownum rnum, niew_num, niew_id, qna_subject,qna_content, qna_file, qna_readcount, qna_date 
+			from (select * from qna_board order by rev_num desc,rev_date asc)) where rnum>=? and rnum<=?
+*/
+	 -->	
+	 <!-- 
+	 select * from (select rownum rnum,BOARD_NUM,BOARD_ID,BOARD_SUBJECT
+				BOARD_CONTENT,BOARD_FILE,BOARD_RE_REF,BOARD_RE_LEV
+				BOARD_RE_SEQ,BOARD_READCOUNT,BOARD_DATE from
+				(select * from memberboard order by 
+				rev_num desc))
+				where rnum>=? and rnum<=?
+	 
+	  -->
+	
+	 <!-- 
+	 select * from (select rownum rnum,BOARD_NUM,BOARD_ID,BOARD_SUBJECT
+				BOARD_CONTENT,BOARD_FILE,BOARD_RE_REF,BOARD_RE_LEV
+				BOARD_RE_SEQ,BOARD_READCOUNT,BOARD_DATE from
+				(select * from memberboard order by 
+				rev_num desc))
+				where rnum>=? and rnum<=?
+	  -->
+	  <!--   여기가 문제 였어....resultType="qnaboard.qnaBean"jdbcType=NUMBER-->
+	 <select id="pagelist"  resultType="qnaboard.QnaBean">	 
+		select * from (select rownum rnum, q_id, q_pw, q_num,q_subject, q_content, q_readcount, q_date from (select * from qna_board order by q_re_ref desc, q_re_lev ASC)) 
+		where rnum &gt;= #{page} and rnum &lt;= #{limit}
+	</select>
+	 
+	<!-- 유효성 체에에크Syntax error, insert "Dimensions" to complete 
+	 TypeArgument resultType="java.util.HashMap"-->	 
+		<select id="check"   resultType="java.util.HashMap">
+		select *  from qna_board where q_id=#{q_id} and q_pw = #{q_pw, jdbcType=VARCHAR} 
+	</select>		
+		<select id="check2"   resultType="qnaboard.QnaBean">
+		select *  from qna_board where q_num=#{q_num } and q_pw = #{q_pw, jdbcType=VARCHAR} 
+	</select>	  
+	<select id="info" resultType="qnaboard.QnaBean">
+		select *  from qna_board where q_num = #{q_num}
+	</select>	<!--  Integer-->
+	 	<select id="qcount"  resultType="Integer">
+		SELECT  COUNT (*) as count  FROM qna_board
+	</select>	 
+	 <delete id="delete">
+		delete from qna_board where q_num = #{q_num}
+	</delete>
+	
+	<update id="update" parameterType="qnaboard.QnaBean">
+		update qna_board set q_subject = #{q_subject}, q_content = #{q_content} 
+		 where q_num = #{q_num}
+	</update>
+	
+	  <!-- 더하기 체크 -->
+	 <update id="countupdate" parameterType="qnaboard.QnaBean">
+		update qna_board set q_readcount = q_readcount+1 
+		 where q_num = #{q_num}
+	</update>
+	
+	<select id="getlist" parameterType="int" resultType="qnaboard.QnaBean">
+		select count(*) from qna_board
+	</select>
+	
+	<insert id="qadd" parameterType="qnaboard.QnaBean">
+		INSERT INTO qna_board ( q_id, q_pw, q_num, q_subject, q_content, q_readcount, q_date, q_re_ref, q_re_lev, q_re_seq)
+		VALUES ( #{q_id}, #{q_pw}, q_seq.NEXTVAL, #{q_subject},#{q_content}, 1, SYSDATE, q_seq.NEXTVAL, 0, 0)
+	</insert>
+	
+	<insert id="reply" parameterType="qnaboard.QnaBean">
+		INSERT INTO qna_board ( q_id, q_pw, q_num, q_subject, q_content, q_readcount, q_date, q_re_ref, q_re_lev, q_re_seq)
+		VALUES ( #{q_id}, #{q_pw}, q_seq.NEXTVAL, #{q_subject}, #{q_content}, 1, SYSDATE, #{q_re_ref}, 1, 0)
+	</insert>
+	
+	
+	<!-- 
+	update memberboard set BOARD_SUBJECT=?,";
+		sql += "BOARD_CONTENT=?, BOARD_FILE=? where BOARD_NUM=?";
+		
+		rev_date = #{rev_sysdate}
+	 -->
+	 <!-- 
+	 rev_subject varchar2(50)not null,
+rev_content varchar2(2000)not null,
+	  -->
+	  
+	 
+	 <!-- 
+	 update memberboard set BOARD_READCOUNT = "
+				+ "BOARD_READCOUNT+1 where BOARD_NUM = " + num;
+	  -->
+	
+	 
+	<!-- 
+<select id="list" resultType="qnaboard.qnaBean">
+		SELECT * FROM qna_board order by q_num desc
+	</select>
+ -->
+
+
+
+	
+	
+	<!-- 
+	BOARD_NUM,BOARD_ID,BOARD_SUBJECT,";
+			sql += "BOARD_CONTENT, BOARD_FILE,BOARD_RE_REF,"
+					+ "BOARD_RE_LEV,BOARD_RE_SEQ,BOARD_READCOUNT,"
+					+ "BOARD_DATE) values(?,?,?,?,?,?,?,?,?,sysdate)";
+					
+					q_num number,
+q_id varchar2(20),  
+q_subject varchar2(50)not null,
+q_content varchar2(2000)not null,
+q_file varchar2(50),
+q_readcount number,
+q_date date,
+ -->
+ 
+	
+	
+	<!-- 
+	<select id="selectPerson" parameterType="int" resultType="hashmap">
+  SELECT * FROM PERSON WHERE ID = #{id}
+</select>
+ -->
+	<!-- 
+	<insert id="add" parameterType="java.util.HashMap">
+		INSERT INTO MEMO_T ( num, writer, content, reg_date, ip )
+		VALUES ( memo_seq.NEXTVAL, #{writer}, #{content}, 
+		SYSDATE, #{ip} )
+	</insert>
+	<update id="update" parameterType="java.util.">
+	 -->
+	<!-- 
+	<select id="list" resultType="test.Emp">
+		select empno, ename, hiredate from emp order by empno desc
+	</select>
+
+	<select id="info" resultType="test.Emp">
+		select empno, ename, hiredate from emp where empno = #{empno}
+	</select>
+	<insert id="insert" parameterType="test.Emp">
+		insert into emp (empno, ename, hiredate)
+		values ( #{empno}, #{ename}, #{hiredate} )
+	</insert>
+	<update id="update" parameterType="test.Emp">
+		update emp set empno = #{empno}, ename = #{ename}, 
+		hiredate = #{hiredate} where empno = #{empno}
+	</update>
+	-->
+	
+	
+	 
+</mapper>

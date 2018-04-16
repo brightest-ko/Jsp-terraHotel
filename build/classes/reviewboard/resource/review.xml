@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper      
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"      
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="terra.reviewboard.ReviewDAO">
+	<!-- 카운트 총 갯수 빼온다@@@페이징@@@@ -->
+	 	<select id="ARcount"  resultType="Integer">
+		select  count (*) as count  from review_board
+	</select>	 
+		<select id="countARuser_id"  resultType="Integer">
+		select  count (*) as count  from review_board where rev_id=#{word}
+	</select>	
+		<select id="countARsubject"  resultType="Integer">
+		select  count (*) as count  from review_board where rev_subject=#{word}
+	</select>	
+		<select id="countARcontent"  resultType="Integer">
+		select  count (*) as count  from review_board where rev_content=#{word}
+	</select>	
+	
+	<!-- pageElist  pageElistuser_id  pageElistsubeject  pageElistcontent  -->
+	<select id="pageARlist" resultType="reviewboard.ReviewBean">
+	 select ROWNUM, rev_num , rev_id , rev_pw , rev_subject, rev_content, rev_file, rev_readcount, rev_date
+	 from ( select ROWNUM rnum, rev_num , rev_id , rev_pw , rev_subject, rev_content, rev_file, rev_readcount,rev_date 
+	 from ( select * from review_board order by rev_num desc)) 
+		where rnum &gt;= #{page} and rnum &lt;= #{limit}	
+	</select>	
+	<select id="pageARlistuser_id" resultType="reviewboard.ReviewBean">
+	select ROWNUM, rev_num , rev_id , rev_pw , rev_subject, rev_content, rev_file, rev_readcount, rev_date
+	 from ( select ROWNUM rnum, rev_num , rev_id , rev_pw , rev_subject, rev_content, rev_file, rev_readcount,rev_date 
+	 from ( select * from review_board  where rev_id like '%'||#{word}||'%' order by rev_num desc))	
+		where rnum &gt;= #{page} and rnum &lt;= #{limit}		
+	</select>
+	<select id="pageARlistsubeject" resultType="reviewboard.ReviewBean">
+	select ROWNUM, rev_num , rev_id , rev_pw , rev_subject, rev_content, rev_file, rev_readcount, rev_date
+	 from ( select ROWNUM rnum, rev_num , rev_id , rev_pw , rev_subject, rev_content, rev_file, rev_readcount,rev_date 
+	 from ( select * from review_board  where rev_subject like '%'||#{word}||'%' order by rev_num desc))	
+		where rnum &gt;= #{page} and rnum &lt;= #{limit}	
+	</select>	
+	<select id="pageARlistcontent" resultType="reviewboard.ReviewBean">
+		select ROWNUM, rev_num , rev_id , rev_pw , rev_subject, rev_content, rev_file, rev_readcount, rev_date
+	 from ( select ROWNUM rnum, rev_num , rev_id , rev_pw , rev_subject, rev_content, rev_file, rev_readcount,rev_date 
+	 from ( select * from review_board  where rev_content like '%'||#{word}||'%' order by rev_num desc))	
+		where rnum &gt;= #{page} and rnum &lt;= #{limit}	
+	</select>	
+	
+	
+	
+	<!-- 여기가 문제 였어....resultType="reviewboard.ReviewBean"jdbcType=NUMBER -->
+	<select id="reviewpagelist" resultType="reviewboard.ReviewBean">
+		select * from (select rownum rnum, rev_num, rev_id, rev_pw, rev_subject,
+		rev_content, rev_file, rev_readcount, rev_date from (select * from
+		review_board order by rev_num desc))
+		where rnum &gt;= #{page} and rnum &lt;= #{limit}
+	</select>
+	<!--commentpagelist 코멘트용 -->
+	<!-- private int rc_no;//댓글시퀀스 pk private String rc_id; //댓글 아이디 로그인 아이디 
+		받음 private String rc_content; //댓글 내용 private Date rc_date; //댓글 날짜 private 
+		int rc_num; //원 게시글 참조@@@@@@ -->
+	<select id="commentpagelist" resultType="reviewboard.ReviewCommentBean">
+		select * from (select rownum rnum, rc_no, rc_id, rc_content, rc_date, rc_num
+		from (select * from review_comment order by rc_date desc))
+		where rnum &gt;= #{page} and rnum &lt;= #{limit}
+	</select>
+	
+	<select id="reviewcommentpagelist" resultType="reviewboard.ReviewCommentBean">
+		select * from (select rownum rnum, rc_no, rc_id, rc_content, rc_date, rc_num
+		from (select * from review_comment order by rc_date desc))
+		where rnum &gt;= #{begin} and rnum &lt;= #{end} and rc_num=#{rc_num}
+	</select>
+   <!-- indexlist -->
+   <select id="indexlist" resultType="reviewboard.ReviewBean">
+		select * from review_board
+	</select>
+
+
+	<!-- 유효성 체에에크Syntax error, insert "Dimensions" to complete TypeArgument 
+		resultType="java.util.HashMap" -->
+	<select id="reviewcheck" resultType="java.util.HashMap">
+		select * from review_board
+		where rev_id=#{rev_id} and rev_pw = #{rev_pw, jdbcType=VARCHAR}
+	</select>
+	<select id="reviewcheck2" resultType="reviewboard.ReviewBean">
+		select * from review_board
+		where rev_num=#{rev_num } and rev_pw = #{rev_pw, jdbcType=VARCHAR}
+	</select>
+	<!-- 리뷰코멘트 인포 -->
+	<select id="reviewcommentinfo" resultType="reviewboard.ReviewCommentBean">
+		select * from
+		review_comment where rc_no = #{rc_no}
+	</select>
+	<!-- 리뷰 인포 -->
+	<select id="reviewinfo" resultType="reviewboard.ReviewBean">
+		select * from review_board
+		where rev_num = #{rev_num}
+	</select>	<!-- Integer -->
+	<select id="reviewcount" resultType="Integer">
+		SELECT COUNT (*) as count
+		FROM review_board
+	</select>
+	<!-- Integer rc_num -->
+	<select id="reviewcommentcount" resultType="Integer">
+		SELECT COUNT (*) as
+		count FROM review_comment where rc_num=#{rc_num}
+	</select>
+<!-- commentdelete -->
+<delete id="commentdelete">
+		delete from review_comment where rc_no = #{rc_no}
+	</delete>
+
+<!-- admincommentdelete관리자 삭제시 무결성 제약조건 때문에 먼저 삭제 -->
+<delete id="admincommentdelete">
+		delete from review_comment where rc_num = #{rc_num}
+	</delete>
+
+
+	<delete id="reviewdelete">
+		delete from review_board where rev_num = #{rev_num}
+	</delete>
+
+<!-- 이미지 없을때 리뷰 -->
+	<update id="reviewupdate" parameterType="reviewboard.ReviewBean">
+		update review_board set
+		rev_subject = #{rev_subject}, rev_content = #{rev_content}, rev_pw=#{rev_pw},rev_date=sysdate
+		where rev_num = #{rev_num}
+	</update>	
+<!-- 이미지 있을때 리뷰 -->
+	<update id="adminreviewupdate" parameterType="reviewboard.ReviewBean">
+		update review_board set
+		rev_subject = #{rev_subject}, rev_content = #{rev_content}, rev_file=#{rev_file, jdbcType=VARCHAR}, rev_pw=#{rev_pw},rev_date=sysdate
+		where rev_num = #{rev_num}
+	</update>
+
+<!-- 이미지 없을때 유저리뷰 -->
+	<update id="reviewuserupdate" parameterType="reviewboard.ReviewBean">
+		update review_board set
+		rev_subject = #{rev_subject}, rev_content = #{rev_content},rev_date=sysdate
+		where rev_num = #{rev_num}
+	</update>	
+<!-- 이미지 있을때 유저리뷰 -->
+	<update id="reviewuserupdate2" parameterType="reviewboard.ReviewBean">
+		update review_board set
+		rev_subject = #{rev_subject}, rev_content = #{rev_content}, rev_file=#{rev_file, jdbcType=VARCHAR},rev_date=sysdate
+		where rev_num = #{rev_num}
+	</update>
+
+	<!-- 더하기 체크 -->
+	<update id="reviewcountupdate" parameterType="reviewboard.ReviewBean">
+		update review_board
+		set rev_readcount = rev_readcount+1
+		where rev_num = #{rev_num}
+	</update>
+
+	<select id="reviewgetlist" parameterType="int"
+		resultType="reviewboard.ReviewBean">
+		select count(*) from review_board
+	</select>
+	<!--  -->
+	<insert id="reviewadd" parameterType="reviewboard.ReviewBean">
+		INSERT INTO review_board
+		(rev_num, rev_id, rev_pw, rev_subject, rev_content, rev_file,
+		rev_readcount, rev_date)
+		VALUES (rev_seq.NEXTVAL, #{rev_id},#{rev_pw},#{rev_subject},#{rev_content}, #{rev_file, jdbcType=VARCHAR}, #{rev_readcount}, SYSDATE)
+	</insert>	
+	<!-- reviewcommentadd -->
+	<insert id="reviewcommentadd" parameterType="reviewboard.ReviewCommentBean">
+		INSERT INTO
+		review_comment (rc_no, rc_id, rc_content, rc_date, rc_num)
+		VALUES (
+		rc_seq.NEXTVAL, #{rc_id},#{rc_content}, SYSDATE,#{rc_num})
+	</insert>
+</mapper>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="terra.reserv.ReservDAO">
+	<select id="Rlist" resultType="reserv.ReservDTO">
+		select resnum , user_id , roomname , fromdate, todate, term, numberOfPeople, resdate from reserv order by resnum desc
+	</select>
+	<select id="reservinfo" resultType="reserv.ReservDTO">
+		select resnum , user_id , roomname , fromdate, todate, term, numberOfPeople, resdate from reserv
+		where resnum = #{resnum}
+	</select>
+	<select id="userinfo1" resultType="reserv.ReservDTO">
+		select resnum , user_id , roomname , fromdate, todate, term, numberOfPeople, resdate from reserv
+		where user_id = #{user_id} and (select to_date(fromdate, 'YYYY-MM-DD') from dual) &gt; sysdate order by resnum desc
+	</select>
+	<select id="userinfo2" resultType="reserv.ReservDTO">
+		select resnum , user_id , roomname , fromdate, todate, term, numberOfPeople, resdate from reserv
+		where user_id = #{user_id} and (select to_date(fromdate, 'YYYY-MM-DD') from dual) &lt;= sysdate order by resnum desc
+	</select>
+	
+	<!-- paging -->
+	<select id="countR" resultType="Integer">
+		SELECT COUNT (*) as count FROM reserv
+	</select>
+	<select id="countRuser_id" resultType="Integer">
+		SELECT COUNT (*) as count FROM reserv WHERE user_id=#{word}
+	</select>
+	<select id="countRroomname" resultType="Integer">
+		SELECT COUNT (*) as count FROM reserv WHERE roomname=#{word}
+	</select>
+	<select id="pageRlist" resultType="reserv.ReservDTO">
+		select ROWNUM, resnum , user_id , roomname , fromdate, todate, term, numberOfPeople, resdate
+		from ( select ROWNUM rnum, resnum , user_id , roomname , fromdate, todate, term, numberOfPeople, resdate
+		from ( select * from reserv order by resnum desc)) 
+		where rnum &gt;= #{page} and rnum &lt;= #{limit}
+	</select>
+	<select id="pageRlistuser_id" resultType="reserv.ReservDTO">
+		select ROWNUM, resnum , user_id , roomname , fromdate, todate, term, numberOfPeople, resdate
+		from ( select ROWNUM rnum, resnum , user_id , roomname , fromdate, todate, term, numberOfPeople, resdate
+		from ( select * from reserv where user_id like '%'||#{word}||'%' order by resnum desc)) 
+		where rnum &gt;= #{page} and rnum &lt;= #{limit}
+	</select>
+	<select id="pageRlistroomname" resultType="reserv.ReservDTO">
+		select ROWNUM, resnum , user_id , roomname , fromdate, todate, term, numberOfPeople, resdate
+		from ( select ROWNUM rnum, resnum , user_id , roomname , fromdate, todate, term, numberOfPeople, resdate
+		from ( select * from reserv where roomname like '%'||#{word}||'%' order by resnum desc)) 
+		where rnum &gt;= #{page} and rnum &lt;= #{limit}
+	</select>
+	
+	
+	<select id="reservdate" resultType="reserv.ReservDTO">
+		select fromdate, todate, term from reserv where roomname = #{roomname}
+	</select>
+	
+	<insert id="Rinsert" parameterType="reserv.ReservDTO">
+		insert into reserv(resnum , user_id , roomname , fromdate, todate, term, numberOfPeople, resdate) values
+		(res_seq.nextval , #{user_id} , #{roomname} , #{fromdate} ,#{todate} ,#{term}, #{numberOfPeople}, sysdate)
+	</insert>
+	<update id="Rupdate" parameterType="reserv.ReservDTO">
+		update reserv set user_id = #{user_id} , 
+		roomname = #{roomname} , fromdate = #{fromdate}, todate = #{todate}, term = #{term},numberOfPeople=#{numberOfPeople}  where resnum = #{resnum}
+	</update>
+	<delete id="Rdelete">
+		delete from reserv  where resnum = #{resnum}
+	</delete>
+	
+	<select id="reservlist" resultType="reserv.ReservDTO">
+		select user_id from reserv where user_id=#{uesr_id}
+	</select>
+	
+</mapper>

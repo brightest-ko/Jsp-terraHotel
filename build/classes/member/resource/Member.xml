@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper      
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"      
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="terra.member.MemberDAO">
+	<select id="login" resultType="java.util.HashMap">
+		select grade from member where user_id = #{user_id} and pw = #{pw}
+	</select>
+	<select id="idcheck" resultType="java.util.HashMap">
+		select user_id from member where user_id = #{check_id}
+	</select>
+	<select id="memberlist" resultType="member.MemberBean">
+		select user_id , uname, email, gender, postnum, addr, detailaddress, areacode, tel, birth, joindate, grade from member order by user_id
+	</select>
+	<select id="memberinfo" resultType="member.MemberBean">
+		select user_id, pw, uname, email, gender, postnum, addr, detailaddress, areacode, tel, birth, joindate, grade from member where user_id=#{user_id}
+	</select>
+	
+	<!-- paging -->
+	<select id="memberCountR" resultType="Integer">
+		SELECT COUNT (*) as count FROM member
+	</select>
+	<select id="memberCountRuser_id" resultType="Integer">
+		SELECT COUNT (*) as count FROM member WHERE user_id=#{word}
+	</select>
+	<select id="memberCountRuname" resultType="Integer">
+		SELECT COUNT (*) as count FROM member WHERE uname=#{word}
+	</select>
+	<select id="memberCountRemail" resultType="Integer">
+		SELECT COUNT (*) as count FROM member WHERE email=#{word}
+	</select>
+	<select id="memberCountRgrade" resultType="Integer">
+		SELECT COUNT (*) as count FROM member WHERE grade=#{word}
+	</select>
+	<select id="memberPageRlist" resultType="member.MemberBean">
+		select ROWNUM, USER_ID, PW, UNAME, EMAIL, GENDER, POSTNUM, ADDR, DETAILADDRESS, AREACODE, TEL, BIRTH, JOINDATE, GRADE
+		from ( select ROWNUM rnum, USER_ID, PW, UNAME, EMAIL, GENDER, POSTNUM, ADDR, DETAILADDRESS, AREACODE, TEL, BIRTH, JOINDATE, GRADE 
+		from ( select * from member order by joindate desc)) 
+		where rnum &gt;= #{page} and rnum &lt;= #{limit}
+	</select>
+	<select id="memberPageRlistuser_id" resultType="member.MemberBean">
+		select ROWNUM, USER_ID, PW, UNAME, EMAIL, GENDER, POSTNUM, ADDR, DETAILADDRESS, AREACODE, TEL, BIRTH, JOINDATE, GRADE
+		from ( select ROWNUM rnum, USER_ID, PW, UNAME, EMAIL, GENDER, POSTNUM, ADDR, DETAILADDRESS, AREACODE, TEL, BIRTH, JOINDATE, GRADE 
+		from ( select * from member where user_id like '%'||#{word}||'%' order by joindate desc)) 
+		where rnum &gt;= #{page} and rnum &lt;= #{limit}
+	</select>
+	<select id="memberPageRlistuname" resultType="member.MemberBean">
+		select ROWNUM, USER_ID, PW, UNAME, EMAIL, GENDER, POSTNUM, ADDR, DETAILADDRESS, AREACODE, TEL, BIRTH, JOINDATE, GRADE
+		from ( select ROWNUM rnum, USER_ID, PW, UNAME, EMAIL, GENDER, POSTNUM, ADDR, DETAILADDRESS, AREACODE, TEL, BIRTH, JOINDATE, GRADE 
+		from ( select * from member where uname like '%'||#{word}||'%' order by joindate desc)) 
+		where rnum &gt;= #{page} and rnum &lt;= #{limit}
+	</select>
+	<select id="memberPageRlistemail" resultType="member.MemberBean">
+		select ROWNUM, USER_ID, PW, UNAME, EMAIL, GENDER, POSTNUM, ADDR, DETAILADDRESS, AREACODE, TEL, BIRTH, JOINDATE, GRADE
+		from ( select ROWNUM rnum, USER_ID, PW, UNAME, EMAIL, GENDER, POSTNUM, ADDR, DETAILADDRESS, AREACODE, TEL, BIRTH, JOINDATE, GRADE 
+		from ( select * from member where email like '%'||#{word}||'%' order by joindate desc)) 
+		where rnum &gt;= #{page} and rnum &lt;= #{limit}
+	</select>
+	<select id="memberPageRlistgrade" resultType="member.MemberBean">
+		select ROWNUM, USER_ID, PW, UNAME, EMAIL, GENDER, POSTNUM, ADDR, DETAILADDRESS, AREACODE, TEL, BIRTH, JOINDATE, GRADE
+		from ( select ROWNUM rnum, USER_ID, PW, UNAME, EMAIL, GENDER, POSTNUM, ADDR, DETAILADDRESS, AREACODE, TEL, BIRTH, JOINDATE, GRADE 
+		from ( select * from member where grade like '%'||#{word}||'%' order by joindate desc)) 
+		where rnum &gt;= #{page} and rnum &lt;= #{limit}
+	</select>
+	
+	<insert id="region">
+		insert into member(user_id, pw, uname, email, gender, postnum, addr, detailaddress, areacode, tel, birth, joindate, grade)
+		values(#{user_id}, #{pw}, #{uname}, #{email}, #{gender}, #{postnum}, #{addr}, #{detailaddress}, #{areacode}, #{tel}, #{birth}, sysdate, 'silver')
+	</insert>
+	<update id="memberupdate" parameterType="member.MemberBean">
+		update member set pw=#{pw}, uname=#{uname}, email=#{email}, gender=#{gender}, postnum=#{postnum}, addr=#{addr}, detailaddress=#{detailaddress}, areacode=#{areacode}, tel=#{tel}, birth=#{birth}, grade=#{grade} where user_id=#{user_id}
+	</update>
+	<delete id="memberdelete">
+		delete from member  where user_id = #{user_id}
+	</delete>
+	
+	<delete id="ndelete">
+		delete from news where n_id = #{user_id}
+	</delete>
+	<delete id="qdelete">
+		delete from qna_board where q_id = #{user_id}
+	</delete>
+	<delete id="ecdelete">
+		delete from EVENT_CHECK where ec_id = #{user_id}
+	</delete>
+	<delete id="evdelete">
+		delete from EVENT_BOARD where ev_id = #{user_id}
+	</delete>
+	<delete id="rcdelete">
+		delete from REVIEW_COMMENT where rc_id = #{user_id}
+	</delete>
+	<delete id="revdelete">
+		delete from REVIEW_BOARD where rev_id = #{user_id}
+	</delete>
+</mapper>

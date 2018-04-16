@@ -1,0 +1,45 @@
+<div class= "row">
+				<div class="col-sm-6">
+				<img class="img-responsive" src="./roomimg/deluxedetail1.jpg" alt="img1">
+				</div>
+		        <div class="col-sm-6"  style="text-align: center;">
+		       <br><br><br><br><br>
+		       <h4>"아늑함, 그리고 편안함"</h4>
+				<article>아늑하고 프라이빗한 공간, 사색적인 분위기의 객실로,</article>
+				<article>Terra의 격조 높은 서비스를 경험하실 수 있습니다. </article>
+				<br>
+				<article>심플하고 모던한 분위기 아래 편안한 라이프 스타일을 반영한</article>
+				<article>이곳은 비지니스를 위해 방문하는 고객이나, 여가를 즐기는 고객</article>
+				<article>모두가 만족 할 수 있습니다.</article>
+			</div></div>
+
+<div class= "row">
+				<div class="col-sm-6">
+				<img class="img-responsive" src="./roomimg/familydetail1.jpg" alt="img1">
+				</div>
+		        <div class="col-sm-6"  style="text-align: center;">
+		       <br><br><br>
+		       <h4>"패밀리 룸, Terra에서 쉬는 이유"</h4>
+				<article>가족 고객분들을 위한 퀸 사이즈 1대, 싱글 사이즈 2대로 구성된</article>
+				<article>베드를 비롯해, 최상의 안락함을 제공합니다.</article>
+				<br>
+				<article>고급스러운 분위기 아래 럭셔리한 라이프 스타일을 반영한</article>
+				<article>이곳은 품격있는 비지니스와 여가를 원하시는 고객</article>
+				<article>모두가 만족 할 수 있습니다.</article>
+				</div>
+			</div>
+<div class= "row">
+				<div class="col-sm-6">
+				<img class="img-responsive" src="./roomimg/sweetdetail1.jpg" alt="img1">
+				</div>
+		        <div class="col-sm-6"  style="text-align: center;">
+		       <br><br><br>
+		       <h4>"스위트 룸, Terra에서 쉬는 이유"</h4>
+				<article>편안한 휴식을 위한 킹 사이즈</article>
+				<article>베드를 비롯해, 최상의 안락함을 제공합니다.</article>
+				<br>
+				<article>고급스러운 분위기 아래 럭셔리한 라이프 스타일을 반영한</article>
+				<article>이곳은 품격있는 비지니스와 여가를 원하시는 고객</article>
+				<article>모두가 만족 할 수 있습니다.</article>
+				</div>
+			</div>
